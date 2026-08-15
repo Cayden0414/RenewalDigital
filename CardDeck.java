@@ -3,63 +3,71 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.AbstractMap;
 import java.util.Random;
 
 public class CardDeck {
-    private Map<String, String> deck;
-    private List<String> keyList;
+    private static final int DEFAULT_PLACEHOLDER_COUNT = 20;
+    private Map<String, List<Card>> deckData;
+    private Map<String, Integer> placeholderCounts;
     private Random random;
-    
+
     public CardDeck() {
-        this.deck = new HashMap<>();
-        this.keyList = new ArrayList<>();
+        this.deckData = new HashMap<>();
+        this.placeholderCounts = new HashMap<>();
         this.random = new Random();
-        initializeDeck();
-        shuffleDeck();
+        createDeck("Default");
+        shuffleDeck("Default");
     }
-    
-    private void initializeDeck() {
-        // Create a list of placeholder titles the user can populate later.
-        // Values are left empty for later population.
-        deck.clear();
-        keyList.clear();
-        int placeholderCount = 20; // adjust as needed
+
+    public void createDeck(String deckName) {
+        initializeDeck(deckName, DEFAULT_PLACEHOLDER_COUNT);
+    }
+
+    private void initializeDeck(String deckName, int placeholderCount) {
+        List<Card> cards = new ArrayList<>();
         for (int i = 1; i <= placeholderCount; i++) {
-            String title = "Placeholder Title " + i;
-            deck.put(title, "");
-            keyList.add(title);
+            cards.add(Card.createPlaceholder(deckName, i));
         }
+        deckData.put(deckName, cards);
+        placeholderCounts.put(deckName, placeholderCount);
     }
-    
-    public void shuffleDeck() {
-        Collections.shuffle(keyList, random);
+
+    public void shuffleDeck(String deckName) {
+        List<Card> cards = deckData.get(deckName);
+        if (cards == null) {
+            return;
+        }
+        Collections.shuffle(cards, random);
     }
-    
-    public Map.Entry<String, String> selectRandomCard() {
-        if (keyList.isEmpty()) return null;
-        int randomIndex = random.nextInt(keyList.size());
-        String title = keyList.get(randomIndex);
-        return new Map.Entry<String,String>(title, deck.get(title));
-    }
-    
-    public Map.Entry<String, String> drawCard() {
-        if (keyList.isEmpty()) {
+
+    public Card selectRandomCard(String deckName) {
+        List<Card> cards = deckData.get(deckName);
+        if (cards == null || cards.isEmpty()) {
             return null;
         }
-        String title = keyList.remove(0);
-        String effects = deck.remove(title);
-        return new Map.Entry<String, String>(title, effects);
+        int randomIndex = random.nextInt(cards.size());
+        return cards.get(randomIndex);
     }
-    
-    public int getRemainingCards() {
-        return keyList.size();
+
+    public Card drawCard(String deckName) {
+        List<Card> cards = deckData.get(deckName);
+        if (cards == null || cards.isEmpty()) {
+            return null;
+        }
+        return cards.remove(0);
     }
-    
-    public void resetDeck() {
-        deck.clear();
-        keyList.clear();
-        initializeDeck();
-        shuffleDeck();
+
+    public int getRemainingCards(String deckName) {
+        List<Card> cards = deckData.get(deckName);
+        return cards == null ? 0 : cards.size();
+    }
+
+    public void resetDeck(String deckName) {
+        Integer count = placeholderCounts.get(deckName);
+        if (count == null) {
+            return;
+        }
+        initializeDeck(deckName, count);
+        shuffleDeck(deckName);
     }
 }
