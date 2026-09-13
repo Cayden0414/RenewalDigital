@@ -30,6 +30,11 @@ public class Card {
         return effect;
     }
 
+    public void activateEffect() {
+        // Implement the logic to activate the effect of the card
+        
+    }
+
     @Override
     public String toString() {
         return "Card{" +

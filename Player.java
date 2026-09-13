@@ -1,26 +1,21 @@
 import java.util.*;
-public class City {
+
+public class Player {
+	public int projectGoal;
 	public String[] titles;
 	public String[] effects;
 	public Card[] cards;
 	public Random random;
-	public Card currentCard;
 
-	public City(String[] titles, String[] effects) {
+	public Player(int goal, String[] titles, String[] effects) {
+		this.projectGoal = goal;
 		this.titles = titles;
 		this.effects = effects;
 		this.cards = new Card[titles.length];
 		this.random = new Random();
-		this.currentCard = null;
 		for (int i = 0; i < titles.length; i++) {
-			cards[i] = new Card("City", titles[i], effects[i]);
+			cards[i] = new Card("Projects", titles[i], effects[i]);
 		}
-	}
-
-	public void playTurn(){
-		currentCard = null; // Discard previous card
-		currentCard = playCard();
-		currentCard.activateEffect();
 	}
 
 	public Card playCard() {
